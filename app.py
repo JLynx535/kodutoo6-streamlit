@@ -120,8 +120,8 @@ table_data=year_data[["Aasta", "Maakond", "Mehed Loomulik iive", "Naised Loomuli
 st.dataframe(table_data, use_container_width=True)
 
 csv=table_data.to_csv(index=False).encode("utf-8-sig")
-st.download_button(
-    label="Laadi tabel CSV-failina alla",
+st.sidebar.download_button(
+    label="Lae tabel CSV-failina alla",
     data=csv,
     file_name=f"loomulik_iive_{selected_year}_{selected_metric_label.lower()}.csv",
     mime="text/csv"
