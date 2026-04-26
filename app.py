@@ -59,17 +59,16 @@ def import_geojson():
 
 
 def get_data_for_year(df, year):
-    year_data=df[df["Aasta"]==year].copy()
-    return year_data
+    return df[df["Aasta"]==year].copy()
 
 
-def make_map(year_data, counties, year):
+def make_map(year_data, counties, year, selected_metric):
     fig=px.choropleth(
         year_data,
         geojson=counties,
         locations="Maakond",
         featureidkey="properties.MNIMI",
-        color="Loomulik iive",
+        color=selected_metric,
         hover_name="Maakond",
         hover_data={
             "Aasta":True,
@@ -78,7 +77,7 @@ def make_map(year_data, counties, year):
             "Loomulik iive":True
         },
         color_continuous_scale="Viridis",
-        title=f"Loomulik iive maakonniti aastal {year}"
+        title=f"{selected_metric} maakonniti aastal {year}"
     )
     fig.update_geos(fitbounds="locations", visible=False)
     fig.update_layout(margin={"r":0, "t":50, "l":0, "b":0})
@@ -96,15 +95,31 @@ counties=import_geojson()
 years=sorted(df["Aasta"].unique())
 selected_year=st.sidebar.selectbox("Vali aasta", years, index=len(years)-1)
 
+metric_options={
+    "Kokku":"Loomulik iive",
+    "Mehed":"Mehed Loomulik iive",
+    "Naised":"Naised Loomulik iive"
+}
+
+selected_metric_label=st.sidebar.selectbox("Vali näitaja", list(metric_options.keys()))
+selected_metric=metric_options[selected_metric_label]
+
 year_data=get_data_for_year(df, selected_year)
-fig=make_map(year_data, counties, selected_year)
+
+fig=make_map(year_data, counties, selected_year, selected_metric)
 st.plotly_chart(fig, use_container_width=True)
 
 st.subheader("Andmetabel")
-st.dataframe(
-    year_data[["Aasta", "Maakond", "Mehed Loomulik iive", "Naised Loomulik iive", "Loomulik iive"]]
-    .sort_values("Loomulik iive", ascending=True),
-    use_container_width=True
+table_data=year_data[["Aasta", "Maakond", "Mehed Loomulik iive", "Naised Loomulik iive", "Loomulik iive"]].sort_values(selected_metric, ascending=True)
+
+st.dataframe(table_data, use_container_width=True)
+
+csv=table_data.to_csv(index=False).encode("utf-8-sig")
+st.download_button(
+    label="Laadi tabel CSV-failina alla",
+    data=csv,
+    file_name=f"loomulik_iive_{selected_year}_{selected_metric_label.lower()}.csv",
+    mime="text/csv"
 )
 
 st.caption("Allikas: Statistikaamet, tabel RV032.")
