@@ -87,7 +87,12 @@ def make_map(year_data, counties, year, selected_metric):
 st.set_page_config(page_title="Loomulik iive maakonniti", layout="wide")
 
 st.title("Loomulik iive Eesti maakondades")
-st.write("Töölaud kasutab Statistikaameti andmeid ning kuvab loomuliku iibe maakondade kaupa.")
+st.write("Töölaud kasutab Statistikaameti andmeid ning kuvab loomuliku iibe maakondade kaupa."
+    "See dashboard kuvab Eesti maakondade loomulikku iivet aastatel 2014–2023. "
+    "Kasutaja saab valida aasta ning vaadata, millistes maakondades oli loomulik iive suurem või väiksem. "
+    "Lisaks saab eraldi vaadata kogu loomulikku iivet ning meeste ja naiste arvestust. "
+    "Andmeid saab vaadata ka tabelina ning vajadusel CSV-failina alla laadida."
+)
 
 df=import_data()
 counties=import_geojson()
